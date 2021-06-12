@@ -23,13 +23,28 @@ class UserCRUD(CRUDBase[User, UserCreate, UserUpdate]):
             db.query(User).filter(User.email == email).first()
         )
 
-    def create(self, db: Session, *, scheme: UserCreate) -> User:
+    def create(self, db: Session, *, schema: UserCreate) -> User:
         db_obj = User(
-            username=scheme.username,
-            email=scheme.email,
-            password=get_password_hash(scheme.password),
-            first_name=scheme.first_name,
-            # is_superuser=scheme.is_superuser,
+            username=schema.username,
+            email=schema.email,
+            password=get_password_hash(schema.password),
+            first_name=schema.first_name,
+            # is_superuser=schema.is_superuser,
+        )
+        db.add(db_obj)
+        db.commit()
+        db.refresh(db_obj)
+        return db_obj
+
+    def create_superuser(self, db: Session, *, schema: UserCreate) -> User:
+        db_obj = User(
+            username=schema.username,
+            email=schema.email,
+            password=get_password_hash(schema.password),
+            first_name=schema.first_name,
+            is_active=True,
+            is_superuser=True,
+            is_staff=True,
         )
         db.add(db_obj)
         db.commit()

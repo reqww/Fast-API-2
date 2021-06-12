@@ -2,7 +2,7 @@ import os
 from . import local
 
 # Secret key
-SECRET_KEY = b"awubsyb872378t^*TG8y68&*&&*8y8yg9POB)*896ft7CR^56dfYUv"
+SECRET_KEY = os.environ.get("SECRET_KEY", local.SECRET_KEY)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

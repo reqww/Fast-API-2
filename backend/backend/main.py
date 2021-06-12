@@ -2,9 +2,9 @@ from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
-from src.config import settings
-from src.db.session import SessionLocal
-from src.app import routers
+from .src.config import settings
+from .src.db.session import SessionLocal
+from .src.app import routers
 
 app = FastAPI(
     title="FASTAPI2",
