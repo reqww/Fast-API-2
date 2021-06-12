@@ -8,6 +8,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 API_STR = "/api"
 
+PROJECT_NAME = "Proj"
+
 # DB
 POSTGRES_USER = os.environ.get("POSTGRES_USER", local.POSTGRES_USER)
 POSTGRES_PASS = os.environ.get("POSTGRES_PASS", local.POSTGRES_PASS)
@@ -26,4 +28,4 @@ BACKEND_CORS_ORIGINS = [
     "http://localhost:8080",
 ]
 
-ACCESS_TOKEN_EXPIRES_MINUTES = 60 * 24 * 8
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 8

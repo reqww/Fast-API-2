@@ -14,12 +14,12 @@ from ..user.models import User
 from ..user import crud, schemas
 
 from .jwt import ALGORITHM
-from .schemas import TokenPayload, VerificationInDB
+from .schemas import TokenPayload, VerificationOut
 from .service import auth_verify
 from .send_email import send_new_account_email
 
 password_reset_jwt_subject = "preset"
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/api/v1/login/access-token")
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/api/login/access-token")
 
 
 def get_current_user(
@@ -57,12 +57,13 @@ def get_current_active_superuser(current_user: User = Security(get_current_user)
 
 def registration_user(new_user: schemas.UserCreateInRegistration, db: Session):
     """Регистрация пользователя"""
+    print(crud.user.get_by_username(db, username=new_user.username))
     if crud.user.get_by_username_email(
         db, username=new_user.username, email=new_user.email
     ):
         return True
     else:
-        user = crud.user.create(db, obj_in=new_user)
+        user = crud.user.create(db, scheme=new_user)
         verify = auth_verify.create(db, user.id)
         send_new_account_email(
             new_user.email, new_user.username, new_user.password, verify.link
@@ -70,7 +71,7 @@ def registration_user(new_user: schemas.UserCreateInRegistration, db: Session):
         return False
 
 
-def verify_registration_user(uuid: VerificationInDB, db: Session):
+def verify_registration_user(uuid: VerificationOut, db: Session):
     """Подтверждение email пользователя"""
     verify = auth_verify.get(db, uuid.link)
     if verify:

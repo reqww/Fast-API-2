@@ -2,6 +2,8 @@ from sqlalchemy import Column, String, Integer, DateTime, Boolean, sql
 
 from ...db.session import Base
 
+# from ..base.model_base import BaseModel
+
 
 class User(Base):
     __tablename__ = "users"
@@ -14,7 +16,7 @@ class User(Base):
     last_name = Column(String(150))
     date_join = Column(DateTime(timezone=True), server_default=sql.func.now())
     last_login = Column(DateTime)
-    is_active = Column(Boolean, default=False)
-    is_staff = Column(Boolean, default=False)
-    is_superuser = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=True)
+    is_staff = Column(Boolean, default=True)
+    is_superuser = Column(Boolean, default=True)
     avatar = Column(String)

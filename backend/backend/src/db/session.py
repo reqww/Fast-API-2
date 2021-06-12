@@ -3,6 +3,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 
 from ..config import settings
+from ..app.base.model_base import BaseModel
 
 engine = create_engine(settings.SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
 db_session = scoped_session(
@@ -10,4 +11,4 @@ db_session = scoped_session(
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = declarative_base()
+Base = declarative_base(cls=BaseModel)

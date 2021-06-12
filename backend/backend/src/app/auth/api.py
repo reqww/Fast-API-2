@@ -10,7 +10,7 @@ from ..base.utils.db import get_db
 
 from ..user import models, schemas, crud
 
-from .schemas import Token, Msg, VerificationInDB
+from .schemas import Token, Msg, VerificationOut
 from .logic import get_current_user
 from .jwt import create_access_token
 from .security import get_password_hash
@@ -59,7 +59,7 @@ def user_registration(
 
 
 @auth_router.post("/confirm-email", response_model=Msg)
-def confirm_email(uuid: VerificationInDB, db: Session = Depends(get_db)):
+def confirm_email(uuid: VerificationOut, db: Session = Depends(get_db)):
     if verify_registration_user(uuid, db):
         return {"msg": "Success verify email"}
     else:
@@ -82,7 +82,7 @@ def recover_password(email: str, db: Session = Depends(get_db)):
             status_code=404,
             detail="The user with this username does not exist in the system.",
         )
-    password_reset_token = generate_password_reset_token(email=email)
+    password_reset_token = generate_password_reset_token(email)
     send_reset_password_email(
         email_to=user.email, email=email, token=password_reset_token
     )
@@ -106,7 +106,6 @@ def reset_password(
     elif not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
     hashed_password = get_password_hash(new_password)
-    user.password = hashed_password
-    db.add(user)
-    db.commit()
+    crud.user.update_password(db, user, hashed_password)
+
     return {"msg": "Password updated successfully"}
