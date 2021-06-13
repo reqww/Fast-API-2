@@ -1,4 +1,5 @@
-from sqlalchemy import Column, String, Integer, DateTime, Boolean, sql
+from sqlalchemy import Column, String, DateTime, Boolean, sql, Integer, ForeignKey
+from sqlalchemy.orm import relationship
 
 from ...db.session import Base
 
@@ -8,7 +9,6 @@ from ...db.session import Base
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True, unique=True)
     username = Column(String, unique=True)
     email = Column(String, unique=True)
     password = Column(String)
@@ -20,3 +20,16 @@ class User(Base):
     is_staff = Column(Boolean, default=True)
     is_superuser = Column(Boolean, default=True)
     avatar = Column(String)
+
+
+class SocialAccount(Base):
+    __tablename__ = "social_account"
+
+    account_id = Column(Integer)
+    provider = Column(String)
+    account_url = Column(String(150))
+    account_login = Column(String(150))
+    account_name = Column(String(150))
+
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    user = relationship("User", backref="social_account")

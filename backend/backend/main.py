@@ -13,6 +13,8 @@ app = FastAPI(
 )
 
 
+app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.BACKEND_CORS_ORIGINS,

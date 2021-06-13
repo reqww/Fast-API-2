@@ -21,6 +21,9 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         self.model = model
 
+    def exists(self, db: Session, **kwargs):
+        return db.query(db.query(self.model.id).filter_by(**kwargs).exists()).scalar()
+
     def get_object_or_404(self, db: Session, id: int) -> Optional[ModelType]:
         pass
 
@@ -33,19 +36,27 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def filter(self, db: Session, **kwargs) -> List[ModelType]:
         return db.query(self.model).filter_by(**kwargs).all()
 
-    def create(self, db: Session, *, scheme: CreateSchemaType, **kwargs) -> ModelType:
-        obj_in_data = jsonable_encoder(scheme)
-        db_obj = self.model(**obj_in_data)
-        db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
-        return db_obj
+    def create(self, db: Session, *, schema: CreateSchemaType, **kwargs) -> ModelType:
+        data = schema.dict()
+        data.update(kwargs)
+
+        db_obj = self.model(**data)
+
+        try:
+            db.add(db_obj)
+        except:
+            pass
+        else:
+            db.commit()
+            db.refresh(db_obj)
+        finally:
+            return db_obj
 
     def update(
-        self, db: Session, *, model: ModelType, scheme: UpdateSchemaType
+        self, db: Session, *, model: ModelType, schema: UpdateSchemaType
     ) -> ModelType:
         obj_data = jsonable_encoder(model)
-        update_data = scheme.dict(skip_defaults=True)
+        update_data = schema.dict(skip_defaults=True)
         for field in obj_data:
             if field in update_data:
                 setattr(model, field, update_data[field])

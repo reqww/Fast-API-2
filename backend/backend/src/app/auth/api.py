@@ -1,14 +1,18 @@
 from datetime import timedelta
 
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
+from starlette.responses import JSONResponse
+
+from ...config.social_app import social_auth
 from ...config import settings
 from ..base.utils.db import get_db
 
-
 from ..user import models, schemas, crud
+from ..user.schemas import SocialAccount, SocialAccountShow
+from ..user.service import create_social_account
 
 from .schemas import Token, Msg, VerificationOut
 from .logic import get_current_user
@@ -29,6 +33,7 @@ auth_router = APIRouter()
 def login_access_token(
     db: Session = Depends(get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ):
+    print(type(db))
     """OAuth2 compatible token login, get an access token for future requests"""
     user = crud.user.authenticate(
         db, username=form_data.username, password=form_data.password
@@ -109,3 +114,26 @@ def reset_password(
     crud.user.update_password(db, user, hashed_password)
 
     return {"msg": "Password updated successfully"}
+
+
+@auth_router.get("/")
+async def login(request: Request):
+    github = social_auth.create_client("github")
+    redirect_uri = "http://localhost:8000/api/auth/github_login"
+    return await github.authorize_redirect(request, redirect_uri)
+
+
+@auth_router.get("/github_login", response_model=SocialAccountShow)
+async def authorize(request: Request, db: Session = Depends(get_db)):
+    token = await social_auth.github.authorize_access_token(request)
+    resp = await social_auth.github.get("user", token=token)
+    profile = resp.json()
+    profile_schema = SocialAccount(
+        account_id=profile.get("id"),
+        provider="github",
+        account_url=profile.get("html_url"),
+        account_login=profile.get("login"),
+        account_name=profile.get("name"),
+    )
+    acc = create_social_account(db, profile_schema)
+    return acc
