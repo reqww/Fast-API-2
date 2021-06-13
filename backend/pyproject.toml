@@ -8,7 +8,6 @@ authors = ["Michail Gurbanov <54814200+reqww@users.noreply.github.com>"]
 python = "^3.8"
 fastapi = "^0.65.2"
 uvicorn = "^0.14.0"
-SQLAlchemy = "^1.4.18"
 psycopg2 = "^2.8.6"
 alembic = "^1.6.5"
 itsdangerous = "^2.0.1"
@@ -21,6 +20,8 @@ typer = "^0.3.2"
 Authlib = "^0.15.4"
 httpx = "^0.18.1"
 pydantic = {extras = ["email"], version = "^1.8.2"}
+tortoise-orm = {extras = ["asyncpg"], version = "^0.17.4"}
+aerich = "^0.5.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

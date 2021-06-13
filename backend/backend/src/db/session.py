@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from ..config import settings
 from ..app.base.model_base import BaseModel
 
-engine = create_engine(settings.SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
+engine = create_engine(settings.ALCH_DATABASE_URL, pool_pre_ping=True)
 db_session = scoped_session(
     sessionmaker(autocommit=False, autoflush=False, bind=engine)
 )

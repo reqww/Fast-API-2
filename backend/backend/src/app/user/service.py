@@ -1,8 +1,28 @@
 from fastapi import HTTPException
 
-from ..user.schemas import UserCreate
+from .schemas import UserCreate
+from .models import User
 from . import crud, schemas
 from ..base.utils.generate import generate_password
+from ..base.service_base import BaseService
+from ..auth.security import get_password_hash
+
+
+class UserService(BaseService):
+    model = User
+    create_schema = schemas.UserCreateInRegistration
+    get_schema = schemas.User_G_Pydantic
+
+    async def create(self, schema: create_schema):
+        hash_password = get_password_hash(schema.dict().pop("password"))
+        return await super().create(
+            self.create_schema(
+                **schema.dict(exclude={"password"}), password=hash_password
+            )
+        )
+
+
+user_objects = UserService(User)
 
 
 def create_social_account(db, profile: schemas.SocialAccount):

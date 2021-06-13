@@ -1,5 +1,10 @@
 from typing import Optional
 from pydantic import BaseModel, EmailStr
+from tortoise.contrib.pydantic import pydantic_model_creator
+
+from .models import User
+
+User_G_Pydantic = pydantic_model_creator(User, name="Get User")
 
 
 class UserBase(BaseModel):
@@ -33,6 +38,7 @@ class UserCreateInRegistration(BaseModel):
     email: EmailStr
     password: str
     first_name: str
+    last_name: str
 
     class Config:
         orm_mode = True
@@ -71,6 +77,7 @@ class SocialAccount(BaseModel):
 
 class SocialAccountShow(SocialAccount):
     id: int
+
 
 class UserPublic(UserBase):
     """For public profile user"""

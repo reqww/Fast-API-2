@@ -16,8 +16,12 @@ POSTGRES_PASS = os.environ.get("POSTGRES_PASS", local.POSTGRES_PASS)
 POSTGRES_HOST = os.environ.get("POSTGRES_HOST", local.POSTGRES_HOST)
 POSTGRES_DB = os.environ.get("POSTGRES_DB", local.POSTGRES_DB)
 
-SQLALCHEMY_DATABASE_URL = (
+ALCH_DATABASE_URL = (
     f"postgresql://{POSTGRES_USER}:{POSTGRES_PASS}@{POSTGRES_HOST}/{POSTGRES_DB}"
+)
+
+DATABASE_URL = (
+    f"postgres://{POSTGRES_USER}:{POSTGRES_PASS}@{POSTGRES_HOST}/{POSTGRES_DB}"
 )
 
 # CORS
@@ -26,6 +30,12 @@ BACKEND_CORS_ORIGINS = [
     "http://localhost:4200",
     "http://localhost:3000",
     "http://localhost:8080",
+]
+
+APPS_MODELS = [
+    "src.app.user.models",
+    "src.app.auth.models",
+    "aerich.models",
 ]
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 8

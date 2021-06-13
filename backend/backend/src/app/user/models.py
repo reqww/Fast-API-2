@@ -1,35 +1,38 @@
 from sqlalchemy import Column, String, DateTime, Boolean, sql, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 
-from ...db.session import Base
-
-# from ..base.model_base import BaseModel
+from tortoise import models, fields
 
 
-class User(Base):
-    __tablename__ = "users"
+class User(models.Model):
 
-    username = Column(String, unique=True)
-    email = Column(String, unique=True)
-    password = Column(String)
-    first_name = Column(String(150))
-    last_name = Column(String(150))
-    date_join = Column(DateTime(timezone=True), server_default=sql.func.now())
-    last_login = Column(DateTime)
-    is_active = Column(Boolean, default=True)
-    is_staff = Column(Boolean, default=True)
-    is_superuser = Column(Boolean, default=True)
-    avatar = Column(String)
+    username = fields.CharField(max_length=100, unique=True)
+    email = fields.CharField(max_length=100, unique=True)
+    password = fields.CharField(max_length=100)
+    first_name = fields.CharField(max_length=100, null=True)
+    last_name = fields.CharField(max_length=100, null=True)
+    date_join = fields.DatetimeField(auto_now_add=True)
+    last_login = fields.DatetimeField(null=True)
+    is_active = fields.BooleanField(default=True)
+    is_staff = fields.BooleanField(default=True)
+    is_superuser = fields.BooleanField(default=True)
+    avatar = fields.CharField(max_length=100, null=True)
+
+    class Meta:
+        table = "user_user"
 
 
-class SocialAccount(Base):
-    __tablename__ = "social_account"
+class SocialAccount(models.Model):
 
-    account_id = Column(Integer)
-    provider = Column(String)
-    account_url = Column(String(150))
-    account_login = Column(String(150))
-    account_name = Column(String(150))
+    account_id = fields.IntField()
+    provider = fields.CharField(max_length=100)
+    account_url = fields.CharField(max_length=200)
+    account_login = fields.CharField(max_length=100)
+    account_name = fields.CharField(max_length=100)
 
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
-    user = relationship("User", backref="social_account")
+    user = fields.ForeignKeyField(
+        "models.User", related_name="social", on_delete=fields.CASCADE
+    )
+
+    class Meta:
+        table = "user_social_account"
